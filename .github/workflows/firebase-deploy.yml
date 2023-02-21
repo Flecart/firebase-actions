@@ -22,7 +22,7 @@ jobs:
         run: npm ci
         working-directory: functions
       - name: Create SA key
-        run: echo '${{ secrets.FIREBASE_DEV_SERVICE_ACCOUNT }}' > gcloud.json
+        run: echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > gcloud.json
         working-directory: functions
       - name: Print json
         run: echo "$(cat gcloud.json)"
