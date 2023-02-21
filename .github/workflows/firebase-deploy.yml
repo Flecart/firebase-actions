@@ -3,12 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - master
-      - pre-production
-      - github-actions
-      - "feature/**"
-    paths:
-      - "functions/**"
+      - main
 jobs:
   build_and_deploy:
     runs-on: macos-latest
