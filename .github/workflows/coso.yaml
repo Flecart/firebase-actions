@@ -1,0 +1,40 @@
+name: Deploy Cloud Functions
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+      - pre-production
+      - github-actions
+      - "feature/**"
+    paths:
+      - "functions/**"
+jobs:
+  build_and_deploy:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 16.x
+      - uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: macOS-node-${{ hashFiles('**/functions/package-lock.json') }}
+          restore-keys: |
+            macOS-node-
+      - name: Build Cloud Functions
+        run: npm ci
+        working-directory: functions
+      - name: Create SA key
+        run: echo '${{ secrets.FIREBASE_DEV_SERVICE_ACCOUNT }}' > gcloud.json
+        working-directory: functions
+      - name: Print json
+        run: echo "$(cat gcloud.json)"
+        working-directory: functions
+      - name: Install firebase tools
+        run: npm install -g firebase-tools
+        working-directory: functions
+      - name: Deploy Cloud Functions
+        run: export GOOGLE_APPLICATION_CREDENTIALS=gcloud.json && npx firebase-tools deploy --only functions --json
+        working-directory: functions
